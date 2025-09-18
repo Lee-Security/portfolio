@@ -8,3 +8,4 @@
 ## 라이브 데모
 - 포트폴리오 사이트 : https://lee-security.github.io/portfolio/lee_security_portfolio.html
 - 심리검사 사이트 : https://lee-security.github.io/portfolio/game1.html
+- 세레머니로 선수 이름 맞추기 : https://lee-security.github.io/portfolio/soccer_ceremony_game.html
