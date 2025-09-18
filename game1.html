@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10문항 심리 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-10 text-center transition-all duration-500">
+
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="fade-in">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">나의 숨겨진 성향 찾기</h1>
+            <p class="text-gray-600 mb-8 text-lg">10개의 질문을 통해 당신의 마음을 들여다보세요.</p>
+            <button onclick="startGame()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                시작하기
+            </button>
+        </div>
+
+        <!-- 질문 화면 -->
+        <div id="question-screen" class="hidden">
+            <div class="mb-6">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: 10%"></div>
+                </div>
+                <p id="question-number" class="text-indigo-600 font-bold mt-2 text-sm">질문 1 / 10</p>
+            </div>
+            <h2 id="question-text" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8" style="min-height: 80px;"></h2>
+            <div id="answer-buttons" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- 답변 버튼들이 여기에 동적으로 추가됩니다. -->
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-500 mb-2">당신의 성향은...</h2>
+            <h1 id="result-type" class="text-4xl sm:text-5xl font-bold text-indigo-600 mb-6"></h1>
+            <div class="bg-indigo-50 p-6 rounded-lg shadow-inner">
+                <p id="result-description" class="text-gray-700 text-lg leading-relaxed"></p>
+            </div>
+            <button onclick="restartGame()" class="mt-8 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                다시하기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "무인도에 단 하나의 물건만 가져갈 수 있다면?",
+                answers: [
+                    { text: "만능 맥가이버칼", type: "A" },
+                    { text: "가장 좋아하는 책", type: "B" },
+                    { text: "위성 전화기", type: "C" },
+                    { text: "푹신한 침낭", type: "D" }
+                ]
+            },
+            {
+                question: "오랜만에 생긴 휴일, 당신은 무엇을 할 건가요?",
+                answers: [
+                    { text: "친구들과 만나 신나게 놀기", type: "C" },
+                    { text: "집에서 밀린 드라마 정주행하기", type: "D" },
+                    { text: "평소 배우고 싶던 것 배우기", type: "A" },
+                    { text: "아무것도 정하지 않고 즉흥적으로 결정하기", type: "B" }
+                ]
+            },
+            {
+                question: "길을 걷다 마음에 드는 가게를 발견했다면?",
+                answers: [
+                    { text: "일단 들어가서 구경한다.", type: "B" },
+                    { text: "가게 이름과 위치를 기억해뒀다 나중에 찾아본다.", type: "A" },
+                    { text: "함께 있는 친구에게 들어가보자고 제안한다.", type: "C" },
+                    { text: "'예쁘네' 생각하고 그냥 지나간다.", type: "D" }
+                ]
+            },
+            {
+                question: "당신에게 초능력이 생긴다면 어떤 능력을 원하나요?",
+                answers: [
+                    { text: "하늘을 나는 능력", type: "B" },
+                    { text: "시간을 되돌리는 능력", type: "D" },
+                    { text: "미래를 보는 능력", type: "A" },
+                    { text: "모든 사람의 마음을 읽는 능력", type: "C" }
+                ]
+            },
+            {
+                question: "팀 프로젝트에서 당신이 선호하는 역할은?",
+                answers: [
+                    { text: "전체 계획을 세우고 방향을 제시하는 리더", type: "A" },
+                    { text: "팀원들의 의견을 조율하는 중재자", type: "C" },
+                    { text: "자료 조사, 발표 자료 제작 등 맡은 일을 묵묵히 수행", type: "D" },
+                    { text: "창의적인 아이디어를 제시하는 아이디어 뱅크", type: "B" }
+                ]
+            },
+            {
+                question: "친구가 약속 시간에 1시간이나 늦었다. 당신의 반응은?",
+                answers: [
+                    { text: "기다리는 동안 다른 볼 일을 본다.", type: "B" },
+                    { text: "정확히 왜 늦었는지 논리적으로 묻는다.", type: "A" },
+                    { text: "걱정스러운 마음에 계속 연락한다.", type: "C" },
+                    { text: "괜찮다고 말하지만, 속으로는 살짝 서운하다.", type: "D" }
+                ]
+            },
+            {
+                question: "여행 계획을 세울 때 당신의 스타일은?",
+                answers: [
+                    { text: "분 단위로 동선과 예산을 짜는 완벽한 계획형", type: "A" },
+                    { text: "숙소와 비행기만 예약하고 나머지는 자유롭게", type: "B" },
+                    { text: "여행 메이트의 의견을 전적으로 따른다.", type: "D" },
+                    { text: "함께 가는 사람들과 상의하며 계획을 세운다.", type: "C" }
+                ]
+            },
+            {
+                question: "갖고 싶은 그림을 선물 받았다. 어디에 걸어둘 것인가?",
+                answers: [
+                    { text: "가장 잘 보이는 거실 중앙", type: "C" },
+                    { text: "나만 볼 수 있는 내 방", type: "D" },
+                    { text: "집의 전체적인 인테리어와 어울리는 곳", type: "A" },
+                    { text: "기분에 따라 위치를 계속 바꾼다.", type: "B" }
+                ]
+            },
+            {
+                question: "당신이 영화감독이라면 어떤 장르의 영화를 만들고 싶나요?",
+                answers: [
+                    { text: "치밀한 구성의 스릴러/추리 영화", type: "A" },
+                    { text: "아름다운 영상미의 예술 영화", type: "B" },
+                    { text: "따뜻한 감동을 주는 휴먼 드라마", type: "C" },
+                    { text: "일상의 소소한 행복을 담은 잔잔한 영화", type: "D" }
+                ]
+            },
+            {
+                question: "10년 후의 나에게 편지를 쓴다면, 주된 내용은?",
+                answers: [
+                    { text: "그동안 이룬 목표들에 대한 칭찬과 격려", type: "A" },
+                    { text: "여전히 자유로운 영혼으로 살고 있는지에 대한 안부", type: "B" },
+                    { text: "소중한 사람들과 행복하게 지내는지에 대한 질문", type: "C" },
+                    { text: "큰 걱정 없이 평온한 삶을 살고 있기를 바라는 마음", type: "D" }
+                ]
+            }
+        ];
+
+        const results = {
+            "A": {
+                type: "열정적인 전략가",
+                description: "당신은 논리적이고 계획적인 성향을 가지고 있습니다. 목표를 세우고 그것을 달성하기 위해 체계적으로 움직이는 것을 즐깁니다. 때로는 너무 완벽을 추구해서 스트레스를 받을 수도 있지만, 당신의 열정과 추진력은 주변 사람들에게 좋은 영감을 줍니다."
+            },
+            "B": {
+                type: "자유로운 예술가",
+                description: "당신은 틀에 얽매이는 것을 싫어하고, 자유롭고 즉흥적인 삶을 추구합니다. 창의적인 아이디어가 넘치며, 세상을 자신만의 독특한 시각으로 바라봅니다. 반복적인 일상에 쉽게 지루함을 느낄 수 있지만, 당신의 긍정적인 에너지는 삶을 더욱 풍요롭게 만듭니다."
+            },
+            "C": {
+                type: "사교적인 외교관",
+                description: "당신은 사람들과의 관계를 매우 중요하게 생각하며, 타고난 공감 능력으로 주변 사람들을 편안하게 해주는 재능이 있습니다. 다른 사람의 감정을 잘 파악하고 분위기를 부드럽게 만드는 역할을 자주 합니다. 때로는 자신의 감정보다 타인을 너무 우선시할 수 있으니, 자신을 돌보는 시간도 잊지 마세요."
+            },
+            "D": {
+                type: "성실한 안정주의자",
+                description: "당신은 평온하고 안정적인 삶을 가장 중요하게 생각합니다. 갈등을 피하고 싶어하며, 익숙하고 편안한 환경에서 가장 큰 행복을 느낍니다. 맡은 일은 성실하게 해내는 책임감 있는 모습을 보이지만, 새로운 도전이나 변화 앞에서는 조금 망설일 수 있습니다. 가끔은 작은 모험을 해보는 것도 좋답니다."
+            }
+        };
+
+        let currentQuestionIndex = 0;
+        let scores = { "A": 0, "B": 0, "C": 0, "D": 0 };
+
+        const startScreen = document.getElementById('start-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionText = document.getElementById('question-text');
+        const answerButtons = document.getElementById('answer-buttons');
+        const progressBar = document.getElementById('progress-bar');
+        const questionNumber = document.getElementById('question-number');
+
+        const resultType = document.getElementById('result-type');
+        const resultDescription = document.getElementById('result-description');
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            questionScreen.classList.add('fade-in');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            // 이전 질문 내용 초기화
+            answerButtons.innerHTML = '';
+            
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = question.question;
+            questionNumber.textContent = `질문 ${currentQuestionIndex + 1} / ${questions.length}`;
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+
+            question.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.textContent = answer.text;
+                button.className = 'bg-white/80 hover:bg-indigo-100 text-gray-700 font-semibold py-4 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-left sm:text-center text-lg';
+                button.onclick = () => selectAnswer(answer.type);
+                answerButtons.appendChild(button);
+            });
+
+            // 애니메이션을 위해 fade-in 클래스 추가
+            questionText.classList.remove('fade-in');
+            void questionText.offsetWidth; // 리플로우 강제
+            questionText.classList.add('fade-in');
+
+            answerButtons.classList.remove('fade-in');
+            void answerButtons.offsetWidth;
+            answerButtons.classList.add('fade-in');
+        }
+
+        function selectAnswer(type) {
+            scores[type]++;
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+        
+        function showResult() {
+            questionScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('fade-in');
+
+            let finalType = "A";
+            let maxScore = 0;
+            
+            for (const type in scores) {
+                if (scores[type] > maxScore) {
+                    maxScore = scores[type];
+                    finalType = type;
+                }
+            }
+
+            resultType.textContent = results[finalType].type;
+            resultDescription.textContent = results[finalType].description;
+        }
+
+        function restartGame() {
+            currentQuestionIndex = 0;
+            scores = { "A": 0, "B": 0, "C": 0, "D": 0 };
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('fade-in');
+        }
+    </script>
+
+</body>
+</html>
