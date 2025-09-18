@@ -6,5 +6,5 @@
 - AI, ML, DL
 
 ## 라이브 데모
-- 포트폴리오 사이트 : 
-- 심리검사 사이트 : 
+- 포트폴리오 사이트 : https://lee-security.github.io/portfolio/lee_security_portfolio.html
+- 심리검사 사이트 : https://lee-security.github.io/portfolio/game1.html
