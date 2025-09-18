@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이상은 - AI 학습자</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --accent-color: #ff6b35;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-light: #ffffff;
+            --text-gray: #f0f0f0;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --ai-gradient: linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #006699 100%);
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 80%, #667eea 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, #764ba2 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, #00d4ff 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.2rem 2rem;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--ai-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-content .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-content .description {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 1s ease 0.4s both;
+            font-weight: 400;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--ai-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 100px 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--ai-gradient);
+            border-radius: 2px;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--ai-gradient);
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            background: var(--ai-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 2rem;
+        }
+
+        .about-text h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .about-text p {
+            font-size: 1.15rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .skill-item {
+            background: var(--card-bg);
+            padding: 1.8rem;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.2);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-level {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Learning Journey Section */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--ai-gradient);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 4rem;
+            width: 45%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 55%;
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            width: 0;
+            height: 0;
+            border: 15px solid transparent;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            right: -30px;
+            border-left-color: var(--card-bg);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -30px;
+            border-right-color: var(--card-bg);
+        }
+
+        .timeline-content p {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            top: 30px;
+            width: 22px;
+            height: 22px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 5px solid var(--dark-bg);
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -60px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -60px;
+        }
+
+        .timeline-date {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-org {
+            color: var(--text-gray);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        /* Goals Section */
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .goal-card {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--ai-gradient);
+        }
+
+        .goal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .goal-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .goal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .goal-description {
+            color: var(--text-gray);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        /* Contact Section */
+        .contact-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.2rem 2.5rem;
+            background: var(--card-bg);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 2px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .footer p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                width: calc(100% - 40px);
+                left: 40px !important;
+            }
+
+            .timeline-dot {
+                left: -60px !important;
+            }
+
+            .timeline-content::before {
+                left: -30px !important;
+                border-right-color: var(--card-bg) !important;
+                border-left-color: transparent !important;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section {
+                padding: 60px 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">이상은</div>
+            <ul class="nav-links">
+                <li><a href="#about">소개</a></li>
+                <li><a href="#learning">학습여정</a></li>
+                <li><a href="#goals">목표</a></li>
+                <li><a href="#contact">연락처</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>이상은</h1>
+            <p class="subtitle">AI를 학습하는 비전공 개발자</p>
+            <p class="description">
+                마이크로소프트 AI 스쿨에서 인공지능 기술을 배우며,
+                새로운 도전을 통해 성장하고 있는 개발자입니다.
+            </p>
+            <a href="#about" class="cta-button">더 알아보기</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <h2 class="section-title">소개</h2>
+        <div class="about-content">
+            <div class="profile-card fade-in">
+                <div class="profile-image">🤖</div>
+                <h3>비전공자의 도전</h3>
+                <p>새로운 분야에 대한 열정과 끊임없는 학습으로<br>AI 개발자로 성장하고 있습니다.</p>
+            </div>
+            <div class="about-text fade-in">
+                <h3>안녕하세요!</h3>
+                <p>
+                    저는 비전공자로서 개발 세계에 발을 들인 이상은입니다. 
+                    마이크로소프트 AI 스쿨에서 인공지능 기술을 체계적으로 학습하고 있으며, 
+                    Python 프로그래밍 기초를 바탕으로 AI 분야의 전문성을 쌓아가고 있습니다.
+                </p>
+                <p>
+                    비전공자라는 한계를 뛰어넘어 끊임없는 학습과 도전을 통해 
+                    AI 기술로 세상에 긍정적인 변화를 만들고 싶습니다.
+                </p>
+                
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <div class="skill-icon">🐍</div>
+                        <div class="skill-name">Python</div>
+                        <div class="skill-level">기초 수준</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">🧠</div>
+                        <div class="skill-name">AI/ML</div>
+                        <div class="skill-level">학습 중</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">☁️</div>
+                        <div class="skill-name">Azure AI</div>
+                        <div class="skill-level">학습 중</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Journey Section -->
+    <section id="learning" class="section">
+        <h2 class="section-title">학습 여정</h2>
+        <div class="timeline">
+            <div class="timeline-item fade-in">
+                <div class="timeline-content">
+                    <div class="timeline-date">2025년 - 현재</div>
+                    <h3 class="timeline-title">마이크로소프트 AI 스쿨</h3>
+                    <p class="timeline-org">Microsoft Korea</p>
+                    <p>인공지능의 기초부터 실무까지 체계적으로 학습하고 있습니다. 
+                    Azure AI 서비스와 머신러닝 기술을 활용한 프로젝트 경험을 쌓으며, 
+                    AI 분야의 전문성을 기르고 있습니다.</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+            
+            <div class="timeline-item fade-in">
+                <div class="timeline-content">
+                    <div class="timeline-date">2024년</div>
+                    <h3 class="timeline-title">개발 분야 진입 결심</h3>
+                    <p class="timeline-org">전환점</p>
+                    <p>비전공 배경에서 벗어나 새로운 도전을 시작했습니다. 
+                    AI와 프로그래밍 분야에 대한 관심을 바탕으로 
+                    체계적인 학습 계획을 수립하고 개발자의 길을 걷기 시작했습니다.</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+            
+            <div class="timeline-item fade-in">
+                <div class="timeline-content">
+                    <div class="timeline-date">2022년</div>
+                    <h3 class="timeline-title">Python 프로그래밍 학습</h3>
+                    <p class="timeline-org">자기주도 학습</p>
+                    <p>개발의 첫걸음으로 Python 언어를 선택하여 기초 문법과 
+                    프로그래밍 개념을 학습했습니다. 알고리즘과 데이터 구조의 
+                    기본기를 다지며 개발자로서의 토대를 마련했습니다.</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Goals Section -->
+    <section id="goals" class="section">
+        <h2 class="section-title">앞으로의 목표</h2>
+        <div class="goals-grid">
+            <div class="goal-card fade-in">
+                <div class="goal-icon">🎯</div>
+                <h3 class="goal-title">AI 프로젝트 구현</h3>
+                <p class="goal-description">
+                    학습한 AI 기술을 바탕으로 실제 문제를 해결하는 
+                    의미있는 프로젝트를 개발하고 포트폴리오를 구축하겠습니다.
+                </p>
+            </div>
+            
+            <div class="goal-card fade-in">
+                <div class="goal-icon">📚</div>
+                <h3 class="goal-title">기술 역량 강화</h3>
+                <p class="goal-description">
+                    Python 실력을 향상시키고, 머신러닝과 딥러닝 기술을 
+                    깊이 있게 학습하여 전문성을 기르겠습니다.
+                </p>
+            </div>
+            
+            <div class="goal-card fade-in">
+                <div class="goal-icon">🤝</div>
+                <h3 class="goal-title">커뮤니티 참여</h3>
+                <p class="goal-description">
+                    AI 개발자 커뮤니티에 적극적으로 참여하여 
+                    네트워킹을 확대하고 지속적인 성장을 이어가겠습니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <h2 class="section-title">연락처</h2>
+        <div class="contact-content fade-in">
+            <p>새로운 기회와 협업, 그리고 함께 성장할 수 있는 만남을 기다립니다!</p>
+            <div class="contact-links">
+                <a href="https://github.com/Lee-Security" class="contact-link">
+                    💻 GitHub
+                </a>
+                <a href="mailto:your.email@example.com" class="contact-link">
+                    📧 Email
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 이상은. AI를 학습하는 비전공 개발자의 성장 여정</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+                // Header background change on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(26, 26, 26, 0.98)';
+            } else {
+                header.style.background = 'rgba(26, 26, 26, 0.95)';
+            }
+        });
+
+        // Typing effect for hero title (optional enhancement)
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            function typing() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typing, speed);
+                }
+            }
+            typing();
+        }
+    </script>
+</body>
+</html>
